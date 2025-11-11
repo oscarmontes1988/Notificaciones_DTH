@@ -1,0 +1,44 @@
+{% extends 'notificaciones/base.html' %}
+
+{% block title %}Carga de Datos{% endblock %}
+
+{% block content %}
+    <h3>Pasos de Ingesta</h3>
+    <p class="text-muted">Siga los pasos para cargar y consolidar los datos.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-4 text-center">
+            <p class="text-muted mb-1">Paso Único</p>
+            <h5 class="card-title">Datos Validados (J. Gregorio)</h5>
+
+            <form method="post" enctype="multipart/form-data" class="mt-4">
+                {% csrf_token %}
+
+                {{ form.archivo_excel }}
+
+                <button type="submit" class="btn btn-primary btn-lg mt-3">
+                    Cargar Excel de J. Gregorio
+                </button>
+            </form>
+            <p class="text-muted mt-3 mb-0"><small>Datos de validación cargados por: Elizabeth Corredor</small></p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="card-title">Datos Consolidados</h5>
+            <p class="card-text">Vea la base maestra con todos los registros consolidados.</p>
+            <a href="{% url 'vista_consolidados' %}" class="btn btn-success">
+                Ver Registros Consolidados ➡️
+            </a>
+        </div>
+    </div>
+{% endblock %}

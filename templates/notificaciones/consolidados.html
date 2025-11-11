@@ -1,0 +1,118 @@
+{% extends 'notificaciones/base.html' %}
+
+{% block title %}Procesos Consolidados{% endblock %}
+
+{% block content %}
+
+<style>
+    .table-responsive {
+        /* Define la altura máxima del panel. 
+           Usa 'vh' (viewport height) para que se ajuste a la pantalla.
+           '70vh' = 70% de la altura de la ventana. */
+        max-height: 70vh;
+        overflow-y: auto; /* Agrega la barra de scroll vertical solo cuando es necesario */
+    }
+
+    .table-responsive thead th {
+        position: sticky; /* ¡Esta es la magia! */
+        top: 0;           /* Se pega al borde superior (del panel) */
+        z-index: 10;      /* Se asegura de que esté por encima de las filas */
+        
+        /* 'table-dark' ya le da el color de fondo, pero si no, 
+           tendrías que agregar 'background-color: #212529;' aquí.
+        */
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Procesos de Vinculación</h3>
+    <a href="{% url 'vista_carga' %}" class="btn btn-secondary">← Volver a Cargar</a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <form action="{% url 'vista_consolidados' %}" method="GET">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    name="q" 
+                    placeholder="Buscar por nombre, cédula, resolución, cargo, tipo..." 
+                    value="{{ query }}">
+                <button class="btn btn-primary" type="submit" id="button-addon2">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID Proceso</th>
+                        <th>Persona (Cédula)</th>
+                        <th>Resolución</th>
+                        <th>Cargo (OPEP)</th>
+                        <th>Tipo Proceso</th>
+                        <th>Estado del Proceso</th>
+                        <th>Fecha Comunicación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in procesos %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>
+                            {{ p.persona.nombre_completo }}<br>
+                            <small class="text-muted">{{ p.persona.cedula }}</small>
+                        </td>
+                        <td>{{ p.resolucion.numero_resolucion }}</td>
+                        <td>
+                            {{ p.cargo.nombre_cargo | default:"N/A" }}<br>
+                            <small class="text-muted">{{ p.cargo.opep_numero | default:"-" }}</small>
+                        </td>
+                        <td>{{ p.get_tipo_proceso_display }}</td>
+                        
+                        <td>
+                            {% if p.estado_proceso == 'Pendiente Notificar' %}
+                                <span class="badge bg-warning text-dark">{{ p.get_estado_proceso_display }}</span>
+                            {% elif p.estado_proceso == 'Posesionado' %}
+                                <span class="badge bg-success">{{ p.get_estado_proceso_display }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ p.get_estado_proceso_display }}</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td>{{ p.fecha_comunicacion|date:"Y-m-d H:i"|default:"--" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted p-4">
+                            {% if query %}
+                                No se encontraron registros que coincidan con la búsqueda: "{{ query }}".
+                            {% else %}
+                                No hay procesos de vinculación para mostrar.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
