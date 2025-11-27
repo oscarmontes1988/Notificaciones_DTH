@@ -137,3 +137,8 @@ LOGIN_REDIRECT_URL = 'inicio'
 # Redirección después de cerrar sesión
 # 'login' es el nombre de la vista de login de Django
 LOGOUT_REDIRECT_URL = 'login'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
