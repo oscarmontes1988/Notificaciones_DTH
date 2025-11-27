@@ -15,12 +15,35 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('notificaciones.urls')),
+
+    # --- RUTAS DE RESTABLECIMIENTO DE CONTRASEÑA (PERSONALIZADAS) ---
+    # Es vital definirlas ANTES del include para que ganen prioridad
+    
+    path('accounts/password_reset/', 
+         auth_views.PasswordResetView.as_view(template_name='registration/recuperar_form.html'), 
+         name='password_reset'),
+
+    path('accounts/password_reset/done/', 
+         auth_views.PasswordResetDoneView.as_view(template_name='registration/recuperar_enviado.html'), 
+         name='password_reset_done'),
+
+    path('accounts/reset/<uidb64>/<token>/', 
+         auth_views.PasswordResetConfirmView.as_view(template_name='registration/recuperar_confirmar.html'), 
+         name='password_reset_confirm'),
+
+    path('accounts/reset/done/', 
+         auth_views.PasswordResetCompleteView.as_view(template_name='registration/recuperar_exito.html'), 
+         name='password_reset_complete'),
+
+    # ---------------------------------------------------------------
+    
     # Incluimos las URLs de autenticación de Django (Login/Logout)
     # Esto es necesario para que {% url 'logout' %} funcione en el menú
     path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('notificaciones.urls')),
 ]
